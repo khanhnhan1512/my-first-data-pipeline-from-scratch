@@ -35,13 +35,13 @@ services:
     networks:
       - elt_network
     depends_on:
-      - source_postgres
+      # - source_postgres
       - destination_postgres
-    healthcheck:
-      test: ["CMD-SHELL", "echo 'ELT script completed'"]
-      interval: 5s
-      retries: 5
-      start_period: 5s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "echo 'ELT script completed'"]
+    #   interval: 5s
+    #   retries: 5
+    #   start_period: 5s
 
   dbt:
     image: ghcr.io/dbt-labs/dbt-postgres:1.4.7
@@ -59,8 +59,8 @@ services:
       - ./custom_postgres:/custom_postgres
       - ./profiles:/profiles
     depends_on:
-      elt_script:
-        condition: service_healthy
+      elt_script: 
+        condition : service_completed_successfully
     environment:
       DBT_PROFILE: default
       DBT_TARGET: dev
