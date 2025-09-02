@@ -2,8 +2,7 @@ version: '3'
 
 services:
   source_postgres:
-    image: postgres:15
-    # image: postgres:9.2
+    image: postgres:latest
     ports:
       - "5433:5432"
     networks:
@@ -16,8 +15,7 @@ services:
       - ./source_db_init/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   destination_postgres:
-    image: postgres:15
-    # image: postgres:9.2
+    image: postgres:latest
     ports:
       - "5434:5432"
     networks:
@@ -29,41 +27,14 @@ services:
 
   elt_script:
     build:
-      context: ./elt_script
-      dockerfile: Dockerfile
-    command: ["python", "elt_script.py"]
+      context: ./elt_script # Directory containing the Dockerfile and elt_script.py
+      dockerfile: Dockerfile # Name of the Dockerfile, if it's something other than "Dockerfile", specify here
+    command: [ "python", "elt_script.py" ]
     networks:
       - elt_network
     depends_on:
-      # - source_postgres
+      - source_postgres
       - destination_postgres
-    # healthcheck:
-    #   test: ["CMD-SHELL", "echo 'ELT script completed'"]
-    #   interval: 5s
-    #   retries: 5
-    #   start_period: 5s
-
-  dbt:
-    image: ghcr.io/dbt-labs/dbt-postgres:1.4.7
-    command:
-      [
-        "run",
-        "--profiles-dir",
-        "/profiles",
-        "--project-dir",
-        "/custom_postgres"
-      ]
-    networks:
-      - elt_network
-    volumes:
-      - ./custom_postgres:/custom_postgres
-      - ./profiles:/profiles
-    depends_on:
-      elt_script: 
-        condition : service_completed_successfully
-    environment:
-      DBT_PROFILE: default
-      DBT_TARGET: dev
 
 networks:
   elt_network:
