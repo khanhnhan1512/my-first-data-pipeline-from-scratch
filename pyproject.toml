@@ -1,0 +1,10 @@
+[project]
+name = "data-pipeline-from-scratch"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "apache-airflow>=3.0.6",
+    "apache-airflow-providers-docker>=4.4.2",
+]
